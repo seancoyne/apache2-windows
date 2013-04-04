@@ -39,12 +39,12 @@ end
 windows_batch "install_apache_svc" do
   creates "c:\\apachesvc.log"
   code <<-EOH
-  c:\\Apache24\\bin\\httpd -k install
+  c:\\Apache22\\bin\\httpd -k install
   touch c:\\apachesvc.log"
   EOH
 end
 
 # Start apache service
-service "Apache2.4" do
+service "Apache2.2" do
   action [ :enable, :start ]
 end
