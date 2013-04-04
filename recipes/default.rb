@@ -2,7 +2,7 @@
 # Cookbook Name:: apache_win
 # Recipe:: default
 #
-# Copyright 2013, Opscode, Inc.
+# Copyright 2013, Opscode
 #
 # All rights reserved - Do Not Redistribute
 #
