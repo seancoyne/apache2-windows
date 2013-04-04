@@ -7,7 +7,10 @@
 # All rights reserved - Do Not Redistribute
 #
 
-include_recipe 'vcredist'
+if node['platform_family'] == "windows"
+	include_recipe	"windows"
+	include_recipe	"vcruntime::vc9"
+end
 
 distfilename = ::File.basename node['apache2']['windows']['source']
 distzipfile = ::File.join(Chef::Config[:file_cache_path],distfilename)
