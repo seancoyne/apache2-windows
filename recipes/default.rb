@@ -7,56 +7,28 @@
 # All rights reserved - Do Not Redistribute
 #
 
-# Copy required packages to server
-%w{httpd-2.4.4-win32.zip php-5.4.13-win32-vc9-x86.zip vcredist_x86.exe}.each do |p|
-  cookbook_file "c:\\#{p}" do
-    source p
-    action :create
-  end
+include_recipe 'vcredist'
+
+distfilename = ::File.basename node['apache2']['windows']['source']
+distzipfile = ::File.join(Chef::Config[:file_cache_path],distfilename)
+
+remote_file distzipfile do
+  source node['apache2']['windows']['source']
+  checksum node['apache2']['windows']['checksum']
 end
 
-# Create required directories
-%w{Apache24 PHP}.each do |d|
-  directory "c:\\#{d}" do
-    action :create
-  end
-end
-
-# Unzip Apache into c:\Apache2.4
-windows_zipfile "c:/" do
-  source "c:/httpd-2.4.4-win32.zip"
-  action :unzip
-  not_if {::File.exists?("c:/Apache24/bin/httpd.exe")}
-end
-
-# Unzip PHP to c:\PHP
-windows_zipfile "c:/PHP" do
-  source "c:/php-5.4.13-win32-vc9-x86.zip"
-  action :unzip
-  not_if {::File.exists?("c:/PHP/php.ini")}
-end
-
-# Install Microsoft VC redistributable
-windows_batch "install_ms_vc" do
-  code <<-EOH
-  c:\\vcredist_x86.exe /q
-  EOH
-end
-
-# Add PHP directory to system path
-windows_path "C:\\PHP" do
-  action :add
-end
-
-# Create httpd.conf
-template "c:\\Apache24\\conf\\httpd.conf" do
-  source "httpd.conf"
+directory node['apache2']['windows']['path'] do
   action :create
 end
 
-# Copy php.ini
-cookbook_file "c:\\php\\php.ini" do
-  source "php.ini"
+windows_zipfile node['apache2']['windows']['path'] do
+  source distzipfile
+  action :unzip
+  not_if {::File.exists?(::File.join(node['apache2']['windows']['path'],'bin','httpd.exe'))}
+end
+
+template ::File.join(node['apache2']['windows']['path'],'conf','httpd.conf') do
+  source "httpd.conf"
   action :create
 end
 
