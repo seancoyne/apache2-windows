@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of apache2-windows.
 
+## 0.1.1:
+
+* Bumping for fun
+
 ## 0.1.0:
 
 * Initial release of apache2-windows
