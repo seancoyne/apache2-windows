@@ -36,6 +36,11 @@ template ::File.join(node['apache2']['windows']['path'],'conf','httpd.conf') do
   action :create
 end
 
+directory node['apache2']['windows']['confd'] do
+  action :create
+end
+
+
 # Install Apache service
 windows_batch "install_apache_svc" do
   creates "#{node['apache2']['windows']['path']}\\apachesvc.log"

@@ -2,4 +2,4 @@ default['apache2']['windows']['source']="http://www.apachelounge.com/download/wi
 default['apache2']['windows']['checksum']="564cfae5935681ad679871f6132f1a8ed28fe3bbd8b2338952b36f335f6dc1db"
 # depends on how the zipfile feels:
 default['apache2']['windows']['path']='c:\Apache2'
-
+default['apache2']['windows']['confd']="#{node['apache2']['windows']['path']}/conf.d"
