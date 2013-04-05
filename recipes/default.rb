@@ -24,7 +24,8 @@ directory node['apache2']['windows']['path'] do
   action :create
 end
 
-windows_zipfile node['apache2']['windows']['path'] do
+#windows_zipfile node['apache2']['windows']['path'] do
+windows_zipfile "C:\\" do
   source distzipfile
   action :unzip
   not_if {::File.exists?(::File.join(node['apache2']['windows']['path'],'bin','httpd.exe'))}
@@ -37,10 +38,10 @@ end
 
 # Install Apache service
 windows_batch "install_apache_svc" do
-  creates "c:\\apachesvc.log"
+  creates "#{node['apache2']['windows']['path']}\\apachesvc.log"
   code <<-EOH
-  c:\\Apache22\\bin\\httpd -k install
-  touch c:\\apachesvc.log"
+  #{node['apache2']['windows']['path']}\\bin\\httpd -k install
+  touch "#{node['apache2']['windows']['path']}\\apachesvc.log"
   EOH
 end
 
