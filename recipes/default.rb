@@ -32,7 +32,6 @@ windows_zipfile "C:\\" do
 end
 
 template ::File.join(node['apache2']['windows']['path'],'conf','httpd.conf') do
-  source "httpd.conf"
   action :create
 end
 
