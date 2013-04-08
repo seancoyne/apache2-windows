@@ -3,3 +3,6 @@ default['apache2']['windows']['checksum']="564cfae5935681ad679871f6132f1a8ed28fe
 # depends on how the zipfile feels:
 default['apache2']['windows']['path']='c:\Apache2'
 default['apache2']['windows']['confd']="#{node['apache2']['windows']['path']}/conf.d"
+
+# this needs fixing!
+default['azurefqdn']="#{node['hostname'].downcase}.cloudapp.net"
