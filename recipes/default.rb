@@ -53,3 +53,16 @@ end
 service "Apache2.2" do
   action [ :enable, :start ]
 end
+
+portname = "web-#{port}"
+port = 80
+
+# Ensure firewall port is open
+execute "open firewall for #{portname}" do
+  timeout 5
+  command "netsh advfirewall firewall add rule name=\"#{portname}\" dir=in action=allow protocol=TCP localport=#{port} enable=yes"
+  only_if {
+    output = %x{netsh advfirewall firewall show rule name=\"#{portname}\"}
+    output.lines.grep(/#{portname}/).empty?
+  }
+end
