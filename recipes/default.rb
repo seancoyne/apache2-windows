@@ -54,8 +54,8 @@ service "Apache2.2" do
   action [ :enable, :start ]
 end
 
-portname = "web-#{port}"
 port = 80
+portname = "web-#{port}"
 
 # Ensure firewall port is open
 execute "open firewall for #{portname}" do
