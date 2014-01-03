@@ -1,68 +1,55 @@
 #
-# Cookbook Name:: apache_win
+# Cookbook Name:: apache2_windows
 # Recipe:: default
 #
-# Copyright 2013, Opscode
+# Copyright 2013, Opscode, Inc.
 #
-# All rights reserved - Do Not Redistribute
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
-if node['platform_family'] == "windows"
-	include_recipe	"windows"
-	include_recipe	"vcruntime::vc9"
+require 'chef/exceptions'
+
+unless node['platform_family'] == 'windows'
+  raise Chef::Exceptions::Application, "This cookbook only works on Microsoft Windows."
 end
 
-distfilename = ::File.basename node['apache2']['windows']['source']
-distzipfile = ::File.join(Chef::Config[:file_cache_path],distfilename)
-
-remote_file distzipfile do
-  source node['apache2']['windows']['source']
-  checksum node['apache2']['windows']['checksum']
+windows_package node['apache']['windows']['display_name'] do
+  source node['apache']['windows']['source']
+  installer_type :msi
+  # The latter four of these options are just to keep the Apache2 service
+  # from failing before rendering the actual httpd.conf.
+  options %W[
+    /quiet
+    INSTALLDIR="#{node['apache']['windows']['dir']}"
+    ALLUSERS=1
+    SERVERADMIN=#{node['apache']['windows']['serveradmin']}
+    SERVERDOMAIN=#{node['fqdn']}
+    SERVERNAME=#{node['fqdn']}
+  ].join(' ')
 end
 
-directory node['apache2']['windows']['path'] do
+template node['apache']['windows']['conf'] do
+  source "httpd.conf.erb"
   action :create
+  notifies :restart, "service[apache2]"
 end
 
-#windows_zipfile node['apache2']['windows']['path'] do
-windows_zipfile "C:\\" do
-  source distzipfile
-  action :unzip
-  not_if {::File.exists?(::File.join(node['apache2']['windows']['path'],'bin','httpd.exe'))}
-end
-
-template ::File.join(node['apache2']['windows']['path'],'conf','httpd.conf') do
-  action :create
-end
-
-directory node['apache2']['windows']['confd'] do
-  action :create
-end
-
-
-# Install Apache service
-windows_batch "install_apache_svc" do
-  creates "#{node['apache2']['windows']['path']}\\apachesvc.log"
-  code <<-EOH
-  #{node['apache2']['windows']['path']}\\bin\\httpd -k install
-  touch "#{node['apache2']['windows']['path']}\\apachesvc.log"
-  EOH
+node['apache']['windows']['extras'].each do |extra|
+  include_recipe "apache2_windows::_extra_#{extra}"
 end
 
 # Start apache service
-service "Apache2.2" do
+service "apache2" do
+  service_name "Apache#{node['apache']['windows']['version'].split('.')[0..1].join('.')}"
   action [ :enable, :start ]
-end
-
-port = 80
-portname = "web-#{port}"
-
-# Ensure firewall port is open
-execute "open firewall for #{portname}" do
-  timeout 5
-  command "netsh advfirewall firewall add rule name=\"#{portname}\" dir=in action=allow protocol=TCP localport=#{port} enable=yes"
-  only_if {
-    output = %x{netsh advfirewall firewall show rule name=\"#{portname}\"}
-    output.lines.grep(/#{portname}/).empty?
-  }
 end
