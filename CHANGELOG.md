@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of apache2_windows.
 
+## 0.2.0:
+
+* First version of the rewritten cookbook.
+
 ## 0.1.1:
 
 * Bumping for fun
