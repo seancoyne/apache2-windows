@@ -1,6 +1,6 @@
 #
 # Author:: Julian C. Dunn (<jdunn@getchef.com>)
-# Cookbook Name:: apache2_windows
+# Cookbook Name:: apache2-windows
 # Resource:: virtualhost
 #
 # Copyright:: 2013, Chef Software, Inc.
@@ -28,7 +28,7 @@ attribute :directory_options, :kind_of => Array, :default => ['FollowSymLinks']
 attribute :allow_overrides, :kind_of => Array, :default => ['None']
 attribute :loglevel, :kind_of => String, :equal_to => %w{emerg alert crit error warn notice info debug}, :default => 'info', :required => true
 attribute :directory_index, :kind_of => [Array, String], :default => 'index.html'
-attribute :template_cookbook, :kind_of => String, :default => 'apache2_windows'
+attribute :template_cookbook, :kind_of => String, :default => 'apache2-windows'
 attribute :template_name, :kind_of => String, :default => 'virtualhost.conf.erb'
 
 default_action :create
